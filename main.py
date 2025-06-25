@@ -1,36 +1,23 @@
 import pygame
-import random
+from logics import *
+import sys
 
 
-def pretty_print(mas):
-    print("-"*10)
-    for row in mas:
-        print(*row)
-    print("-" * 10)
-
-def get_number_from_index(i,j):
-    return i*4+j+1
-
-def get_index_from_number(num):
-    num -= 1
-    x,y = num//4, num%4
-    return x,y
-
-def insert_2_or_4(mas,x,y):
-    if random.random()<=0.75:
-        mas[x][y] = 2
-    else:
-        mas[x][y] = 4
-    return mas
-
-def get_empty_list(mas):
-    empty = []
-    for i in range(4):
-        for j in range(4):
-            if mas[i][j]==0:
-                num = get_number_from_index(i,j)
-                empty.append(num)
-    return empty
+def draw_interface():
+    pygame.draw.rect(screen, WHITE, TITLE_REC)
+    pretty_print(mas)
+    for row in range(BLOCKS):
+        for column in range(BLOCKS):
+            value = mas[row][column]
+            text = font.render(f"{value}", True, BLACK)
+            w = column * SIZE_BLOCKS + (column + 1) * MARGIN
+            h = row * SIZE_BLOCKS + (row + 1) * MARGIN + SIZE_BLOCKS
+            pygame.draw.rect(screen, COLORS[value], (w, h, SIZE_BLOCKS, SIZE_BLOCKS))
+            if value != 0:
+                font_w, font_h = text.get_size()
+                text_x = w + (SIZE_BLOCKS - font_w) / 2
+                text_y = h + (SIZE_BLOCKS - font_h) / 2
+                screen.blit(text, (text_x, text_y))
 
 mas = [
     [0, 0, 0, 0],
@@ -39,36 +26,75 @@ mas = [
     [0, 0, 0, 0],
 ]
 
-# pygame.init()
-# size = (800, 600)
-# screen = pygame.display.set_mode(size)
-# pygame.display.set_caption("2048")
-# font = pygame.font.SysFont("comicsansms", 32)
-#
-# #Цвета
-# RED = (255,0,0)
-# GREEN = (0,255,0)
-# BLUE = (0,0,255)
-# BLACK = (0,0,0)
-#
-# img = pygame.image.load("2048_logo.svg.png")
-# pygame.display.set_icon(img)
-# FPS = 60
-# clock = pygame.time.Clock()
-#
-while True:
-    input()
-    empty = get_empty_list(mas)
-    random.shuffle(empty)
-    random_num = empty.pop()
-    x, y = get_index_from_number(random_num)
-    mas = insert_2_or_4(mas, x ,y)
-    print(f"Мы заполнили элемент под номером {random_num}")
-    pretty_print(mas)
+COLORS = {
+    0: (130, 130, 130),
+    2: (255, 255, 255),
+    4: (255, 255, 128),
+    8: (138, 105, 76),
+    16: (153, 112, 77),
+    32: (166, 115, 71),
+    64: (181, 118, 63),
+    128: (191, 117, 52),
+    256: (207, 115, 35),
+    512: (222, 116, 24),
+    1024: (237, 115, 9),
+    2048: (237, 115, 9),
+}
 
-    # for event in pygame.event.get():
-    #     if event.type == pygame.QUIT:
-    #         quit()
+#Размеры блоков
+BLOCKS = 4
+SIZE_BLOCKS = 110
+MARGIN = 10
+WIDTH = BLOCKS*SIZE_BLOCKS + (BLOCKS+1)*MARGIN
+HEIGHT = WIDTH+110
+TITLE_REC = pygame.Rect(0,0,WIDTH,110)
+
+#Цвета
+RED = (255,0,0)
+GREEN = (0,255,0)
+BLUE = (0,0,255)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+GRAY = (130, 130, 130)
+
+pygame.init()
+screen = pygame.display.set_mode((WIDTH,HEIGHT))
+pygame.display.set_caption("2048")
+font = pygame.font.SysFont("comicsansms", 70)
+img = pygame.image.load("2048_logo.svg.png")
+pygame.display.set_icon(img)
+FPS = 60
+clock = pygame.time.Clock()
+draw_interface()
+pygame.display.update()
+
+#запускаем игру
+while is_zero_in_mas(mas) or can_move(mas):
+    for event in pygame.event.get():
+        #закрыть игру
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit(0)
+        #сама игра идет отсюда
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                mas = move_left(mas)
+            elif event.key == pygame.K_RIGHT:
+                mas = move_right(mas)
+            if event.key == pygame.K_UP:
+                mas = move_up(mas)
+            if event.key == pygame.K_DOWN:
+                mas = move_down(mas)
+            empty = get_empty_list(mas)
+            random.shuffle(empty)
+            random_num = empty.pop()
+            x, y = get_index_from_number(random_num)
+            mas = insert_2_or_4(mas, x ,y)
+            draw_interface()
+            print(f"Мы заполнили элемент под номером {random_num}")
+            pygame.display.update()
+
+
     # clock.tick(FPS)
     # screen.fill(BLACK)
     # pygame.display.update()
