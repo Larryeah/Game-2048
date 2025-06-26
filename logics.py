@@ -37,6 +37,7 @@ def is_zero_in_mas(mas):
     else: return False
 
 def move_left(mas):
+    delta = 0
     for row in mas:
         while 0 in row:
             row.remove(0)
@@ -46,11 +47,13 @@ def move_left(mas):
         for j in range(3):
             if mas[i][j] == mas[i][j+1] and mas[i][j] != 0:
                 mas[i][j] *= 2
+                delta += mas[i][j]
                 mas[i].pop(j+1)
                 mas[i].append(0)
-    return mas
+    return mas, delta
 
 def move_right(mas):
+    delta = 0
     for row in mas:
         while 0 in row:
             row.remove(0)
@@ -60,11 +63,13 @@ def move_right(mas):
         for j in range(3, 0, -1):
             if mas[i][j] == mas[i][j-1] and mas[i][j] != 0:
                 mas[i][j] *= 2
+                delta += mas[i][j]
                 mas[i].pop(j-1)
                 mas[i].insert(0, 0)
-    return mas
+    return mas, delta
 
 def move_up(mas):
+    delta = 0
     for j in range(4):
         column = []
         for i in range(4):
@@ -75,13 +80,15 @@ def move_up(mas):
         for i in range(3):
             if column[i] == column[i+1] and column != 0:
                 column[i]*=2
+                delta += column[i]
                 column.pop(i+1)
                 column.append(0)
         for i in range(4):
             mas[i][j] = column[i]
-    return mas
+    return mas, delta
 
 def move_down(mas):
+    delta = 0
     for j in range(4):
         column = []
         for i in range(4):
@@ -92,11 +99,12 @@ def move_down(mas):
         for i in range(3, 0,-1):
             if column[i] == column[i-1] and column != 0:
                 column[i]*=2
+                delta += column[i]
                 column.pop(i-1)
                 column.insert(0,0)
         for i in range(4):
             mas[i][j] = column[i]
-    return mas
+    return mas, delta
 
 def can_move(mas):
     for i in range(3):
