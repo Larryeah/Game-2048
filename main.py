@@ -55,7 +55,26 @@ def draw_intro():
         pygame.display.update()
     screen.fill(BLACK)
 
-
+def draw_game_over():
+    text_game_over = font_score.render(f"Game over", True, ORANGE)
+    text_score = font_score.render(f"Your score: {score}", True, ORANGE)
+    best_score = GAMERS_DB[0][1]
+    if score > best_score:
+        text = "New record!"
+    else:
+        text = f"Best record {best_score}"
+    text_record = font_top.render(text, True, ORANGE)
+    while True:
+        for event in pygame.event.get():
+            # закрыть игру
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+        screen.fill(BLACK)
+        screen.blit(text_game_over, (150, 200))
+        screen.blit(text_score, (50, 250))
+        screen.blit(text_record, (150, 330))
+        pygame.display.update()
 
 def draw_interface(score, delta=0):
     pygame.draw.rect(screen, WHITE, TITLE_REC)
@@ -170,14 +189,16 @@ while is_zero_in_mas(mas) or can_move(mas):
             if event.key == pygame.K_DOWN:
                 mas, delta = move_down(mas)
             score += delta
-            empty = get_empty_list(mas)
-            random.shuffle(empty)
-            random_num = empty.pop()
-            x, y = get_index_from_number(random_num)
-            mas = insert_2_or_4(mas, x ,y)
+            if is_zero_in_mas(mas):
+                empty = get_empty_list(mas)
+                random.shuffle(empty)
+                random_num = empty.pop()
+                x, y = get_index_from_number(random_num)
+                mas = insert_2_or_4(mas, x ,y)
             draw_interface(score, delta)
             print(f"Мы заполнили элемент под номером {random_num}")
             pygame.display.update()
+draw_game_over()
 
 
 
